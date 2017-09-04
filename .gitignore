@@ -37,6 +37,9 @@ buildNumber.properties
 # Mongo Explorer plugin:
 .idea/**/mongoSettings.xml
 
+# IntelliJ IML file
+.iml
+
 ## File-based project format:
 *.iws
 
