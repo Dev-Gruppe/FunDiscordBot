@@ -34,9 +34,8 @@ public interface CommandRegistry {
    * possible. It filters the commands and calls their trigger methods.
    *
    * @param event an event object with the information.
-   * @return a CommandResponse in order to react detailed to the response of trigger method.
    */
-  CommandResponse triggerCommandByEvent(MessageReceivedEvent event);
+  void onMessageReceived(MessageReceivedEvent event);
 
   /**
    * This method is used to get the assigned command object for the given class. It can be used for
@@ -46,4 +45,18 @@ public interface CommandRegistry {
    * @return the command object
    */
   Command getCommandObjectByClass(Class<? extends Command> commandClass);
+
+  /**
+   * This method is used to get the assigned command object for the given commandName.
+   *
+   * @param commandName the name which is used for the base command name to get the assigned command object.
+   * @return the command object
+   */
+  Command getCommandObjectByName(String commandName);
+
+  /**
+   * @return the command prefix
+   */
+  String getPrefix();
+
 }

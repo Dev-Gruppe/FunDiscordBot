@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum CommandResponse {
-  ACCEPTED(true), NOT_FOUND(false), SYNTAX_PRINTED(true);
+  ACCEPTED(true), SYNTAX_PRINTED(true);
 
   private final boolean success;
 

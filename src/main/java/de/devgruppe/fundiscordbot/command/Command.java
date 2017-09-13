@@ -1,8 +1,7 @@
 package de.devgruppe.fundiscordbot.command;
 
-import net.dv8tion.jda.core.entities.Message;
-
 import lombok.Getter;
+import net.dv8tion.jda.core.entities.Message;
 
 @Getter
 public abstract class Command {
@@ -26,7 +25,7 @@ public abstract class Command {
    *
    * @param message the message object from the JDA api.
    * @param args    can be of size 0 and used to hand over some extra information.
-   * @return whether the command was accepted or not.
+   * @return a CommandResponse in order to react detailed to the response of trigger method.
    */
-  public abstract boolean triggerCommand(Message message, String[] args);
+  public abstract CommandResponse triggerCommand(Message message, String[] args);
 }
