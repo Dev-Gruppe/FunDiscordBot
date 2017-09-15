@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public class Configuration {
   private File configFile;
-  @Getter(AccessLevel.PUBLIC)
+  @Getter
   private Config config;
   private Gson gson;
 
