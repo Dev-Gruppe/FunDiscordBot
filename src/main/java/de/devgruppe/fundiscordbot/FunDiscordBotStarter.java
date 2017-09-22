@@ -3,6 +3,7 @@ package de.devgruppe.fundiscordbot;
 import de.devgruppe.fundiscordbot.command.CommandRegistry;
 import de.devgruppe.fundiscordbot.command.commands.CommandListCommand;
 import de.devgruppe.fundiscordbot.command.commands.EchoCommand;
+import de.devgruppe.fundiscordbot.command.commands.JokeCommand;
 import de.devgruppe.fundiscordbot.command.impl.DefaultCommandRegistry;
 import de.devgruppe.fundiscordbot.config.Config;
 import de.devgruppe.fundiscordbot.config.Configuration;
@@ -72,6 +73,7 @@ public class FunDiscordBotStarter implements EventListener {
   private void registerCommands(){
     this.commandRegistry.registerCommand(new CommandListCommand());
     this.commandRegistry.registerCommand(new EchoCommand());
+    this.commandRegistry.registerCommand(new JokeCommand());
   }
 
   @Override
