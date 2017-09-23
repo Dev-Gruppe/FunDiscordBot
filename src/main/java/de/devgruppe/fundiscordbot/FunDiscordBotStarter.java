@@ -2,6 +2,7 @@ package de.devgruppe.fundiscordbot;
 
 import de.devgruppe.fundiscordbot.command.CommandRegistry;
 import de.devgruppe.fundiscordbot.command.commands.CommandListCommand;
+import de.devgruppe.fundiscordbot.command.commands.CountCommand;
 import de.devgruppe.fundiscordbot.command.commands.EchoCommand;
 import de.devgruppe.fundiscordbot.command.commands.RandomCommand;
 import de.devgruppe.fundiscordbot.command.impl.DefaultCommandRegistry;
@@ -74,6 +75,7 @@ public class FunDiscordBotStarter implements EventListener {
     this.commandRegistry.registerCommand(new CommandListCommand());
     this.commandRegistry.registerCommand(new EchoCommand());
     this.commandRegistry.registerCommand(new RandomCommand());
+    this.commandRegistry.registerCommand(new CountCommand());
   }
 
   @Override
