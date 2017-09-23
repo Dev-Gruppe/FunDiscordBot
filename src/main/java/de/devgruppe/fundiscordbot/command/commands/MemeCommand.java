@@ -39,7 +39,6 @@ public class MemeCommand extends Command {
 				if (textString.contains(";")) {
 					int count = textString.length() - textString.replace(";", "").length();
 					if (count > 1) {
-						System.out.println("A");
 						message.getTextChannel().sendMessage("Du darfst maximal ein Semikolon(``;``) in deine Nachricht schreiben!").complete();
 						return CommandResponse.ACCEPTED;
 					}
