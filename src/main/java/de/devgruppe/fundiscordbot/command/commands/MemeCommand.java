@@ -37,30 +37,32 @@ public class MemeCommand extends Command {
 				textString = textString.replace("\"", "''");
 
 				if (textString.contains(";")) {
-					String[] splitText = textString.split(";");
-					if (splitText.length > 2) {
-						message.getTextChannel().sendMessage("Du darfst maximal ein Semikolon(;) in deine Nachricht schreiben!").complete();
+					int count = textString.length() - textString.replace(";", "").length();
+					if (count > 1) {
+						System.out.println("A");
+						message.getTextChannel().sendMessage("Du darfst maximal ein Semikolon(``;``) in deine Nachricht schreiben!").complete();
 						return CommandResponse.ACCEPTED;
 					}
+					String[] splitText = textString.split(";");
 					urlRequest.append(splitText[0]).append("/").append(splitText[1]);
 				} else {
 					urlRequest.append(texts.toString());
 				}
+				HttpRequest.RequestResponse res = HttpRequest.performRequest(new HttpRequest.RequestBuilder(MemeNamesCommand.API_URL + MemeNamesCommand.TEMPLATE_URL + urlRequest.toString(), HttpRequest.HttpRequestMethod.GET)
+						.addHeader("User-Agent", "Mozilla/5.0")
+						.addHeader("Accept", "application/json")
+						.setReadTimeout(15000));
+
+				JsonElement jsonElement = new JsonParser().parse(res.getResultMessage());
+				JsonObject jsonObject = jsonElement.getAsJsonObject();
+				jsonObject = jsonObject.getAsJsonObject("direct");
+
+				message.getTextChannel().sendMessage(jsonObject.get("masked").getAsString()).queue();
+				return CommandResponse.ACCEPTED;
 			}
-
-			HttpRequest.RequestResponse res = HttpRequest.performRequest(new HttpRequest.RequestBuilder(MemeNamesCommand.API_URL + MemeNamesCommand.TEMPLATE_URL + urlRequest.toString(), HttpRequest.HttpRequestMethod.GET)
-					.addHeader("User-Agent", "Mozilla/5.0")
-					.addHeader("Accept", "application/json")
-					.setReadTimeout(15000));
-
-			JsonElement jsonElement = new JsonParser().parse(res.getResultMessage());
-			JsonObject jsonObject = jsonElement.getAsJsonObject();
-			jsonObject = jsonObject.getAsJsonObject("direct");
-
-			message.getTextChannel().sendMessage(jsonObject.get("masked").getAsString()).queue();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return CommandResponse.ACCEPTED;
+		return CommandResponse.SYNTAX_PRINTED;
 	}
 }
