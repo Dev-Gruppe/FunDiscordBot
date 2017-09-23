@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandResponse;
 import de.devgruppe.fundiscordbot.util.HttpRequest;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import net.dv8tion.jda.core.entities.Message;
 
@@ -58,10 +59,14 @@ public class MemeCommand extends Command {
 
 				message.getTextChannel().sendMessage(jsonObject.get("masked").getAsString()).queue();
 				return CommandResponse.ACCEPTED;
+			}else{
+				return CommandResponse.SYNTAX_PRINTED;
 			}
+		} catch (FileNotFoundException exe){
+			message.getTextChannel().sendMessage("Meme konnte nicht gefunden werden! Versuche ``!memes``").queue();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return CommandResponse.SYNTAX_PRINTED;
+		return CommandResponse.ACCEPTED;
 	}
 }
