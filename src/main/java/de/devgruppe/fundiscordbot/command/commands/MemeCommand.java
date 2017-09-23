@@ -57,7 +57,7 @@ public class MemeCommand extends Command {
 			JsonObject jsonObject = jsonElement.getAsJsonObject();
 			jsonObject = jsonObject.getAsJsonObject("direct");
 
-			message.getTextChannel().sendMessage(jsonObject.get("masked").getAsString()).complete();
+			message.getTextChannel().sendMessage(jsonObject.get("masked").getAsString()).queue();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
