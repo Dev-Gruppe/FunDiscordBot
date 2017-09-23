@@ -16,6 +16,7 @@ public class CommandListCommand extends Command {
   }
 
   @Override
+
   public CommandResponse triggerCommand(Message message, String[] args) {
     StringBuilder stringBuilder = new StringBuilder();
     CommandRegistry commandRegistry = FunDiscordBotStarter.getInstance().getCommandRegistry();

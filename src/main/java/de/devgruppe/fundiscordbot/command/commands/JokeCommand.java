@@ -5,6 +5,7 @@ import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandResponse;
 import de.devgruppe.fundiscordbot.json.Joke;
 import de.devgruppe.fundiscordbot.json.JokeResponse;
+import de.devgruppe.fundiscordbot.utils.DiscordEscaper;
 import net.dv8tion.jda.core.entities.Message;
 
 import java.io.BufferedReader;
@@ -52,7 +53,7 @@ public class JokeCommand extends Command {
   @Override
   public CommandResponse triggerCommand(Message message, String[] args) {
     Joke joke = this.jokes.get(Constants.RANDOM.nextInt(this.jokes.size()));
-    String jokeString = joke.getJoke().contains("Chuck Norris") ? joke.getJoke().replace("Chuck Norris", message.getAuthor().getName()) : joke.getJoke();
+    String jokeString = DiscordEscaper.escape(joke.getJoke().contains("Chuck Norris") ? joke.getJoke().replace("Chuck Norris", message.getAuthor().getName()) : joke.getJoke());
     message.getTextChannel().sendMessage(jokeString).complete();
     return CommandResponse.ACCEPTED;
   }
