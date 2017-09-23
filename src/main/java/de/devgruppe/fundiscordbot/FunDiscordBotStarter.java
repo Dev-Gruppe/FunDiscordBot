@@ -4,10 +4,14 @@ import de.devgruppe.fundiscordbot.command.CommandRegistry;
 import de.devgruppe.fundiscordbot.command.commands.CommandListCommand;
 import de.devgruppe.fundiscordbot.command.commands.CountCommand;
 import de.devgruppe.fundiscordbot.command.commands.EchoCommand;
+import de.devgruppe.fundiscordbot.command.commands.MemeCommand;
+import de.devgruppe.fundiscordbot.command.commands.MemeNamesCommand;
 import de.devgruppe.fundiscordbot.command.commands.RandomCommand;
 import de.devgruppe.fundiscordbot.command.impl.DefaultCommandRegistry;
 import de.devgruppe.fundiscordbot.config.Config;
 import de.devgruppe.fundiscordbot.config.Configuration;
+import java.util.Scanner;
+import javax.security.auth.login.LoginException;
 import lombok.Getter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -18,9 +22,6 @@ import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.EventListener;
 import org.apache.log4j.Logger;
-
-import javax.security.auth.login.LoginException;
-import java.util.Scanner;
 
 public class FunDiscordBotStarter implements EventListener {
 
@@ -76,6 +77,8 @@ public class FunDiscordBotStarter implements EventListener {
     this.commandRegistry.registerCommand(new EchoCommand());
     this.commandRegistry.registerCommand(new RandomCommand());
     this.commandRegistry.registerCommand(new CountCommand());
+    this.commandRegistry.registerCommand(new MemeCommand());
+    this.commandRegistry.registerCommand(new MemeNamesCommand());
   }
 
   @Override
