@@ -9,5 +9,5 @@ import lombok.Data;
 public class Config {
 
   private String botToken = "";
-
+  private String giphyApiKey = "";
 }
