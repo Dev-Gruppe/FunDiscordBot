@@ -13,9 +13,9 @@ import java.io.IOException;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 
-public class GifTrending extends Command {
+public class GifTrendingCommand extends Command {
 
-	public GifTrending() {
+	public GifTrendingCommand() {
 		super("giftrending", "", "Zeigt dir random trending Gifs von Giphy.com an");
 	}
 

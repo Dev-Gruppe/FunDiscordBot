@@ -1,15 +1,17 @@
 package de.devgruppe.fundiscordbot;
 
-import com.google.common.reflect.ClassPath;
-import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandRegistry;
+import de.devgruppe.fundiscordbot.command.commands.CommandListCommand;
+import de.devgruppe.fundiscordbot.command.commands.CountCommand;
 import de.devgruppe.fundiscordbot.command.commands.EchoCommand;
+import de.devgruppe.fundiscordbot.command.commands.GifCommand;
+import de.devgruppe.fundiscordbot.command.commands.GifTrendingCommand;
+import de.devgruppe.fundiscordbot.command.commands.MemeCommand;
+import de.devgruppe.fundiscordbot.command.commands.MemeNamesCommand;
+import de.devgruppe.fundiscordbot.command.commands.RandomCommand;
 import de.devgruppe.fundiscordbot.command.impl.DefaultCommandRegistry;
 import de.devgruppe.fundiscordbot.config.Config;
 import de.devgruppe.fundiscordbot.config.Configuration;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import javax.security.auth.login.LoginException;
 import lombok.Getter;
@@ -73,7 +75,14 @@ public class FunDiscordBotStarter implements EventListener {
 	}
 
 	private void registerCommands() {
-		registerCommandsInPackage(EchoCommand.class.getPackage().getName());
+		this.commandRegistry.registerCommand(new CommandListCommand());
+		this.commandRegistry.registerCommand(new EchoCommand());
+		this.commandRegistry.registerCommand(new RandomCommand());
+		this.commandRegistry.registerCommand(new CountCommand());
+		this.commandRegistry.registerCommand(new MemeCommand());
+		this.commandRegistry.registerCommand(new MemeNamesCommand());
+		this.commandRegistry.registerCommand(new GifCommand());
+		this.commandRegistry.registerCommand(new GifTrendingCommand());
 	}
 
 	@Override
@@ -97,20 +106,4 @@ public class FunDiscordBotStarter implements EventListener {
 		System.exit(0);
 	}
 
-	private void registerCommandsInPackage(String p) {
-		try {
-			List<Class> classes = new ArrayList<>();
-			for (ClassPath.ClassInfo classInfo : ClassPath.from(getClass().getClassLoader()).getTopLevelClassesRecursive(p)) {
-				Class clazz = Class.forName(classInfo.getName());
-				if (clazz.getSuperclass().getName().equals(Command.class.getName())) {
-					classes.add(clazz);
-				}
-			}
-			for (Class clazz : classes) {
-				this.commandRegistry.registerCommand((Command) clazz.newInstance());
-			}
-		} catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-			e.printStackTrace();
-		}
-	}
 }
