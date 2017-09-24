@@ -47,7 +47,7 @@ public class MemeCommand extends Command {
 				} else {
 					urlRequest.append(textString);
 				}
-				HttpRequest.RequestResponse res = HttpRequest.performRequest(new HttpRequest.RequestBuilder(MemeNamesCommand.API_URL + MemeNamesCommand.TEMPLATE_URL + urlRequest.toString(), HttpRequest.HttpRequestMethod.GET)
+				HttpRequest.RequestResponse res = HttpRequest.performRequest(new HttpRequest.RequestBuilder(MemeNamesCommand.API_URL + MemeNamesCommand.TEMPLATE_URL + urlRequest.toString().toLowerCase(), HttpRequest.HttpRequestMethod.GET)
 						.addHeader("User-Agent", "Mozilla/5.0")
 						.addHeader("Accept", "application/json")
 						.setReadTimeout(15000));
