@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import net.dv8tion.jda.core.entities.Message;
 
@@ -26,9 +27,9 @@ public class MemeNamesCommand extends Command {
 
 		try {
 			HttpRequest.RequestResponse res = HttpRequest.performRequest(new HttpRequest.RequestBuilder(API_URL + TEMPLATE_URL, HttpRequest.HttpRequestMethod.GET)
-			.addHeader("User-Agent","Mozilla/5.0")
-			.addHeader("Accept","application/json")
-			.setReadTimeout(15000));
+					.addHeader("User-Agent", "Mozilla/5.0")
+					.addHeader("Accept", "application/json")
+					.setReadTimeout(15000));
 			JsonParser parser = new JsonParser();
 			JsonObject jobject = parser.parse(res.getResultMessage()).getAsJsonObject();
 			jobject.entrySet().stream()
@@ -44,11 +45,13 @@ public class MemeNamesCommand extends Command {
 	@Override
 	public CommandResponse triggerCommand(Message message, String[] args) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Folgende Memes können generiert werden");
-		sb.append("```");
-		memes.forEach(s -> sb.append(s).append("\n"));
-		sb.append("```");
-		message.getTextChannel().sendMessage(sb.toString()).queue();
+		sb.append("Folgende Memes können generiert werden: \n");
+
+		StringBuilder finalSb = sb;
+		memes.forEach(s -> finalSb.append("``").append(s).append("``").append(", "));
+		sb = new StringBuilder(sb.substring(0, sb.length() - 2));
+		message.getTextChannel().sendMessage(sb.toString()).queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
+		message.delete().queueAfter(15, TimeUnit.SECONDS);
 		return CommandResponse.ACCEPTED;
 	}
 }
