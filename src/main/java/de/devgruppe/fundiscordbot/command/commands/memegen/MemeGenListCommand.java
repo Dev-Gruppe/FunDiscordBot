@@ -1,4 +1,4 @@
-package de.devgruppe.fundiscordbot.command.commands.meme;
+package de.devgruppe.fundiscordbot.command.commands.memegen;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -14,45 +14,42 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
+import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
 
-public class MemeListCommand extends Command {
-  public static final String API_URL = "https://memegen.link/";
-  public static final String TEMPLATE_URL = "api/templates/";
-
+public class MemeGenListCommand extends Command {
   @Getter
   private final List<String> memes = new ArrayList<>();
 
-  public MemeListCommand() {
+  public MemeGenListCommand() {
     super("memes", "", "Gebe dir alle Meme-Namen aus.");
     try {
-      HttpRequest.RequestResponse response = HttpRequest.performRequest(new HttpRequest.RequestBuilder(API_URL + TEMPLATE_URL, HttpRequest.HttpRequestMethod.GET)
-              .addHeader(MemeConstants.REQUEST_HEADERS[0], MemeConstants.REQUEST_HEADERS[1])
-              .addHeader(MemeConstants.REQUEST_HEADERS[2], MemeConstants.REQUEST_HEADERS[3])
+      HttpRequest.RequestResponse response = HttpRequest.performRequest(new HttpRequest.RequestBuilder(
+              MemeGenHelper.REQUEST_URL + MemeGenHelper.TEMPLATE_PATH, HttpRequest.HttpRequestMethod.GET)
+              .addHeader(MemeGenHelper.REQUEST_HEADERS[0], MemeGenHelper.REQUEST_HEADERS[1])
+              .addHeader(MemeGenHelper.REQUEST_HEADERS[2], MemeGenHelper.REQUEST_HEADERS[3])
               .setReadTimeout(FunDiscordBotStarter.getInstance().getConfig().getMemeTimeout()));
-      if (response.getStatus() == MemeConstants.EXPECTED_RESPONSE_CODE) {
+      if (response.getStatus() == MemeGenHelper.EXPECTED_RESPONSE_CODE) {
         final JsonParser parser = new JsonParser();
         final JsonObject jsonObject = parser.parse(response.getResultMessage()).getAsJsonObject();
         jsonObject.entrySet().stream().map(Map.Entry::getValue).map(jsonElement -> jsonElement.getAsString()
-                .replace(API_URL + TEMPLATE_URL, "")).forEach(memes::add);
+                .replace(MemeGenHelper.REQUEST_URL + MemeGenHelper.TEMPLATE_PATH, "")).forEach(memes::add);
       } else {
-
+        FunDiscordBotStarter.getLogger().warn("The memegen.link server returned an unexpected HTTP Status code (" + response.getStatus() + "): " + response.getResultMessage());
       }
-
     } catch (IOException e) {
-      e.printStackTrace();
+      FunDiscordBotStarter.getLogger().error("An error occurred while fetching the meme names.", e);
     }
   }
 
   @Override
   public CommandResponse triggerCommand(Message message, String[] args) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("Folgende Memes können generiert werden");
-    sb.append("```");
-    memes.forEach(s -> sb.append(s).append("\n"));
-    sb.append("```");
-    message.getTextChannel().sendMessage(sb.toString()).queue();
+    StringJoiner listJoiner = new StringJoiner(", ");
+    memes.forEach(s -> listJoiner.add("``" + s + "``"));
+    message.getTextChannel().sendMessage("Folgende Memes können generiert werden: \n" + listJoiner.toString())
+            .queue(msg -> msg.delete().queueAfter(20, TimeUnit.SECONDS));
     return CommandResponse.ACCEPTED;
   }
 }

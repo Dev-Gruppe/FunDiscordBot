@@ -18,7 +18,13 @@ public class TrendingGiphyCommand extends Command {
   private static final String GIPHY_SUB_PATH = "trending";
   private static final String ADDITIONAL_GIPHY_HEADERS = "&limit=1&offset=%d";
 
+  private static final String EMBED_TITLE_TEMPLATE = "Trendendes GIF #%d";
+
+  private static final String JSON_DATA_KEY = "data";
   private static final String JSON_ID_KEY = "id";
+  private static final String JSON_IMAGES_KEY = "images";
+  private static final String JSON_ORIGINAL_KEY = "original";
+  private static final String JSON_URL_KEY = "url";
 
   public TrendingGiphyCommand() {
     super("giftrending", "", "Zeigt dir ein zufälliges trending Gif von Giphy.com an.");
@@ -41,28 +47,25 @@ public class TrendingGiphyCommand extends Command {
 
   private void performCommandAction(final Message message) {
     try {
-      final String url = String.format(GiphyConstants.BASE_URL_TEMPLATE, GIPHY_SUB_PATH,
+      final String url = String.format(GiphyHelper.BASE_URL_TEMPLATE, GIPHY_SUB_PATH,
               FunDiscordBotStarter.getInstance().getConfig().getGiphyApiKey(), String.format(ADDITIONAL_GIPHY_HEADERS, offset));
       final HttpRequest.RequestResponse response = HttpRequest.performRequest(new HttpRequest.RequestBuilder(url, HttpRequest.HttpRequestMethod.GET)
-              .setReadTimeout(FunDiscordBotStarter.getInstance().getConfig().getGiphyTimeout())
-              .addHeader(GiphyConstants.REQUEST_HEADER[0], GiphyConstants.REQUEST_HEADER[1]));
-      if (response.getStatus() == GiphyConstants.EXPECTED_RESPONSE_CODE) {
+              .setReadTimeout(FunDiscordBotStarter.getInstance().getConfig().getMemeTimeout())
+              .addHeader(GiphyHelper.REQUEST_HEADER[0], GiphyHelper.REQUEST_HEADER[1]));
+      if (response.getStatus() == GiphyHelper.EXPECTED_RESPONSE_CODE) {
         final JsonElement jsonElement = new JsonParser().parse(response.getResultMessage());
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        final JsonArray jsonArray = jsonObject.getAsJsonArray("data");
+        final JsonArray jsonArray = jsonObject.getAsJsonArray(JSON_DATA_KEY);
         if (jsonArray.size() == 0) {
           this.handleNotFound(message);
         } else {
           jsonObject = jsonArray.get(0).getAsJsonObject();
           final String id = jsonObject.get(JSON_ID_KEY).getAsString();
-          jsonObject = jsonObject.getAsJsonObject("images");
-          jsonObject = jsonObject.getAsJsonObject("original");
-
-          message.getTextChannel().sendMessage("``#" + id + "``\n" + jsonObject.get("url").getAsString()).queue();
+          jsonObject = jsonObject.getAsJsonObject(JSON_IMAGES_KEY).getAsJsonObject(JSON_ORIGINAL_KEY);
+          message.getTextChannel().sendMessage(GiphyHelper.buildEmbedGiphy(
+                  String.format(EMBED_TITLE_TEMPLATE, offset), jsonObject.get(JSON_URL_KEY).getAsString(), message.getAuthor().getName(), id)).queue();
           offset++;
         }
-      } else if (response.getStatus() == GiphyConstants.NOT_FOUND_RESPONSE_CODE) {
-        this.handleNotFound(message);
       } else {
         FunDiscordBotStarter.getLogger().warn("The giphy.com server returned an unexpected HTTP Status code (" + response.getStatus() + "): " + response.getResultMessage());
         message.getTextChannel().sendMessage("Der Server von giphy.com gab einen unerwarteten HTTP Status code zurück!").queue();

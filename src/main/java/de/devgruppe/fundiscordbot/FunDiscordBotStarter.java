@@ -1,10 +1,14 @@
 package de.devgruppe.fundiscordbot;
 
-import com.google.common.reflect.ClassPath;
-
-import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandRegistry;
+import de.devgruppe.fundiscordbot.command.commands.CommandListCommand;
+import de.devgruppe.fundiscordbot.command.commands.CountCommand;
 import de.devgruppe.fundiscordbot.command.commands.EchoCommand;
+import de.devgruppe.fundiscordbot.command.commands.RandomCommand;
+import de.devgruppe.fundiscordbot.command.commands.giphy.RandomGiphyCommand;
+import de.devgruppe.fundiscordbot.command.commands.giphy.TrendingGiphyCommand;
+import de.devgruppe.fundiscordbot.command.commands.memegen.MemeGenCommand;
+import de.devgruppe.fundiscordbot.command.commands.memegen.MemeGenListCommand;
 import de.devgruppe.fundiscordbot.command.impl.DefaultCommandRegistry;
 import de.devgruppe.fundiscordbot.config.Config;
 import de.devgruppe.fundiscordbot.config.Configuration;
@@ -20,9 +24,6 @@ import net.dv8tion.jda.core.hooks.EventListener;
 
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import javax.security.auth.login.LoginException;
@@ -45,6 +46,7 @@ public class FunDiscordBotStarter implements EventListener {
   private static Logger logger;
 
   private FunDiscordBotStarter() {
+    instance = this;
     configuration = new Configuration();
     if (!configuration.exists()) {
       Config config = new Config();
@@ -76,11 +78,18 @@ public class FunDiscordBotStarter implements EventListener {
 
   public static void main(String[] args) {
     logger = Logger.getLogger("FunDiscordBot");
-    instance = new FunDiscordBotStarter();
+    new FunDiscordBotStarter();
   }
 
   private void registerCommands() {
-    registerCommandsInPackage(EchoCommand.class.getPackage().getName());
+    this.commandRegistry.registerCommand(new CommandListCommand());
+    this.commandRegistry.registerCommand(new EchoCommand());
+    this.commandRegistry.registerCommand(new RandomCommand());
+    this.commandRegistry.registerCommand(new CountCommand());
+    this.commandRegistry.registerCommand(new MemeGenListCommand());
+    this.commandRegistry.registerCommand(new MemeGenCommand());
+    this.commandRegistry.registerCommand(new RandomGiphyCommand());
+    this.commandRegistry.registerCommand(new TrendingGiphyCommand());
   }
 
   @Override
@@ -102,22 +111,5 @@ public class FunDiscordBotStarter implements EventListener {
   private void stopBot(Event event) {
     event.getJDA().shutdown();
     System.exit(0);
-  }
-
-  private void registerCommandsInPackage(final String packageName) {
-    try {
-      final List<Class> classes = new ArrayList<>();
-      for (final ClassPath.ClassInfo classInfo : ClassPath.from(getClass().getClassLoader()).getTopLevelClassesRecursive(packageName)) {
-        final Class clazz = Class.forName(classInfo.getName());
-        if (clazz.getSuperclass().getName().equals(Command.class.getName())) {
-          classes.add(clazz);
-        }
-      }
-      for (final Class clazz : classes) {
-        this.commandRegistry.registerCommand((Command) clazz.newInstance());
-      }
-    } catch (final IOException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-      e.printStackTrace();
-    }
   }
 }

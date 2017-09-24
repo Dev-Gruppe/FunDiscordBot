@@ -1,4 +1,4 @@
-package de.whynotminecraft.timerankupdater.util;
+package de.devgruppe.fundiscordbot.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
