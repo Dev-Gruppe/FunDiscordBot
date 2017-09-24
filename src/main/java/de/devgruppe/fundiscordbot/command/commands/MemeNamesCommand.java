@@ -48,7 +48,6 @@ public class MemeNamesCommand extends Command {
 		sb.append("```");
 		memes.forEach(s -> sb.append(s).append("\n"));
 		sb.append("```");
-		System.out.println(sb.length());
 		message.getTextChannel().sendMessage(sb.toString()).queue();
 		return CommandResponse.ACCEPTED;
 	}
