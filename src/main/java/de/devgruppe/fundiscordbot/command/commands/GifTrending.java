@@ -43,7 +43,7 @@ public class GifTrending extends Command {
 			jsonObject = jsonObject.getAsJsonObject("images");
 			jsonObject = jsonObject.getAsJsonObject("original");
 
-			message.getTextChannel().sendMessage("#``" + id + "``\n" + jsonObject.get("url").getAsString()).queue();
+			message.getTextChannel().sendMessage("``#" + id + "``\n" + jsonObject.get("url").getAsString()).queue();
 			offset++;
 		} catch (IOException e) {
 			e.printStackTrace();
