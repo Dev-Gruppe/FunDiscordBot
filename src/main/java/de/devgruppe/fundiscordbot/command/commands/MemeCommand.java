@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandResponse;
-import de.devgruppe.fundiscordbot.util.HttpRequest;
+import de.devgruppe.fundiscordbot.utils.HttpRequest;
 import java.awt.Color;
 import java.io.FileNotFoundException;
 import java.io.IOException;
