@@ -10,4 +10,5 @@ public class Config {
 
   private String botToken = "";
   private String giphyApiKey = "";
+  private int giphyTimeout = 1000;
 }

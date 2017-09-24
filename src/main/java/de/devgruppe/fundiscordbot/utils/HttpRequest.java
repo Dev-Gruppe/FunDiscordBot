@@ -1,4 +1,4 @@
-package de.devgruppe.fundiscordbot.util;
+package de.devgruppe.fundiscordbot.utils;
 
 
 import java.io.DataOutputStream;
