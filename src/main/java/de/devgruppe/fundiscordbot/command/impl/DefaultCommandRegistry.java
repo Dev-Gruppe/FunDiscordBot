@@ -67,7 +67,7 @@ public class DefaultCommandRegistry extends ListenerAdapter implements CommandRe
   @Override
   public Command getCommandObjectByName(String commandName) {
     return this.commands.stream()
-        .filter(command -> command.getCommandName().equals(commandName))
+        .filter(command -> command.getCommandName().equalsIgnoreCase(commandName))
         .findFirst()
         .orElse(null);
   }
