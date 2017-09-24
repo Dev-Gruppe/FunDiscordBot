@@ -9,6 +9,7 @@ import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandResponse;
 import de.devgruppe.fundiscordbot.util.HttpRequest;
 import java.io.IOException;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 
 public class GifTrending extends Command {
@@ -43,7 +44,13 @@ public class GifTrending extends Command {
 			jsonObject = jsonObject.getAsJsonObject("images");
 			jsonObject = jsonObject.getAsJsonObject("original");
 
-			message.getTextChannel().sendMessage("``#" + id + "``\n" + jsonObject.get("url").getAsString()).queue();
+			message.getTextChannel().sendMessage(new EmbedBuilder()
+					.setTitle("Trending gif #" + offset)
+					.setImage(jsonObject.get("url").getAsString())
+					.addField("ID","``#"+ id + "``",true)
+					.addField("Requested by",message.getAuthor().getName(),true)
+					.addField("URL", jsonObject.get("url").getAsString(),true)
+					.build()).queue();
 			offset++;
 		} catch (IOException e) {
 			e.printStackTrace();

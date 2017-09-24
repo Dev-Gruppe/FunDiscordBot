@@ -6,8 +6,10 @@ import com.google.gson.JsonParser;
 import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandResponse;
 import de.devgruppe.fundiscordbot.util.HttpRequest;
+import java.awt.Color;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 
 public class MemeCommand extends Command {
@@ -22,7 +24,6 @@ public class MemeCommand extends Command {
 			if (args.length < 1) {
 				return CommandResponse.SYNTAX_PRINTED;
 			}
-			JsonParser parser = new JsonParser();
 			StringBuilder urlRequest = new StringBuilder();
 			urlRequest.append(args[0]).append("/");
 			if (args.length >= 2) {
@@ -57,7 +58,22 @@ public class MemeCommand extends Command {
 				JsonObject jsonObject = jsonElement.getAsJsonObject();
 				jsonObject = jsonObject.getAsJsonObject("direct");
 
-				message.getTextChannel().sendMessage(jsonObject.get("masked").getAsString()).queue();
+				String[] splitUrlReq = urlRequest.toString().split("/");
+				String topText = splitUrlReq[1];
+				String bottomText = "-";
+				if(splitUrlReq.length > 2)
+					bottomText = splitUrlReq[2];
+				message.getTextChannel().sendMessage(new EmbedBuilder()
+						.setColor(Color.GREEN)
+						.setTitle(" ")
+						.addField("Name",args[0],true)
+						.addField("Top text", topText,true)
+						.addField("Bottom text", bottomText, true)
+						.addField("Created by", message.getAuthor().getName(),true)
+						.addField("URL",jsonObject.get("masked").getAsString(),true)
+						.setImage(jsonObject.get("masked").getAsString())
+						.build()).queue();
+
 				return CommandResponse.ACCEPTED;
 			}else{
 				return CommandResponse.SYNTAX_PRINTED;
