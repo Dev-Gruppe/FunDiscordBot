@@ -8,6 +8,7 @@ import de.devgruppe.fundiscordbot.FunDiscordBotStarter;
 import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandResponse;
 import de.devgruppe.fundiscordbot.utils.HttpRequest;
+import java.awt.Color;
 import java.io.IOException;
 import java.net.URLEncoder;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -50,6 +51,7 @@ public class GifCommand extends Command {
 			jsonObject = jsonObject.getAsJsonObject("data");
 
 			message.getTextChannel().sendMessage(new EmbedBuilder()
+					.setColor(Color.GREEN)
 					.setTitle("Random gif")
 					.setImage(jsonObject.get("image_url").getAsString())
 					.addField("ID", "``#" + jsonObject.get("id").getAsString() + "``", true)

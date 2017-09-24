@@ -8,6 +8,7 @@ import de.devgruppe.fundiscordbot.FunDiscordBotStarter;
 import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandResponse;
 import de.devgruppe.fundiscordbot.utils.HttpRequest;
+import java.awt.Color;
 import java.io.IOException;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -45,6 +46,7 @@ public class GifTrending extends Command {
 			jsonObject = jsonObject.getAsJsonObject("original");
 
 			message.getTextChannel().sendMessage(new EmbedBuilder()
+					.setColor(Color.GREEN)
 					.setTitle("Trending gif #" + offset)
 					.setImage(jsonObject.get("url").getAsString())
 					.addField("ID","``#"+ id + "``",true)
