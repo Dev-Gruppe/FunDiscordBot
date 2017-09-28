@@ -1,7 +1,6 @@
 package de.devgruppe.fundiscordbot.cooldown;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import net.dv8tion.jda.core.entities.Member;
 
 import java.util.HashMap;
@@ -24,17 +23,17 @@ public class CooldownEntry {
       cooldowns.put(member.getUser().getId(), System.currentTimeMillis());
   }
 
-  public void removeMember(Member member){
-    if(containsMember(member))
+  public void removeMember(Member member) {
+    if (containsMember(member))
       cooldowns.remove(member.getUser().getId());
   }
 
-  public boolean containsMember(Member member){
+  public boolean containsMember(Member member) {
     return cooldowns.containsKey(member.getUser().getId());
   }
 
-  public long getCooldownStart(Member member){
-    if(!containsMember(member)) return -1;
+  public long getCooldownStart(Member member) {
+    if (!containsMember(member)) return -1;
     return cooldowns.get(member.getUser().getId());
   }
 

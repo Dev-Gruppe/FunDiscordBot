@@ -9,7 +9,7 @@ import de.devgruppe.fundiscordbot.command.commands.memegen.MemeGenListCommand;
 import de.devgruppe.fundiscordbot.command.impl.DefaultCommandRegistry;
 import de.devgruppe.fundiscordbot.config.Config;
 import de.devgruppe.fundiscordbot.config.Configuration;
-
+import lombok.Getter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -18,15 +18,10 @@ import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.EventListener;
-
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import java.util.Scanner;
-
 import javax.security.auth.login.LoginException;
-
-import lombok.Getter;
+import java.util.Scanner;
 
 public class FunDiscordBotStarter implements EventListener {
 
@@ -58,11 +53,12 @@ public class FunDiscordBotStarter implements EventListener {
     logger.info("Connecting...");
     try {
       jda = new JDABuilder(AccountType.BOT)
-              .setToken(this.config.getBotToken())
-              .setAutoReconnect(true)
-              .addEventListener(this)
-              .setGame(Game.of("https://github.com/Dev-Gruppe/FunDiscordBot", "https://github.com/Dev-Gruppe/FunDiscordBot"))
-              .buildAsync();
+          .setToken(this.config.getBotToken())
+          .setAutoReconnect(true)
+          .addEventListener(this)
+          .setGame(
+              Game.of("https://github.com/Dev-Gruppe/FunDiscordBot", "https://github.com/Dev-Gruppe/FunDiscordBot"))
+          .buildAsync();
     } catch (LoginException | RateLimitedException e) {
       e.printStackTrace();
     }

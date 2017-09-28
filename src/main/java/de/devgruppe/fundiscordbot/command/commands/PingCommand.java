@@ -11,7 +11,7 @@ import net.dv8tion.jda.core.entities.Message;
 /**
  * Created by GalaxyHD on 26.09.2017.
  */
-public class PingCommand extends Command implements ICooldown{
+public class PingCommand extends Command implements ICooldown {
 
   private static final int COUNT = 8;
 

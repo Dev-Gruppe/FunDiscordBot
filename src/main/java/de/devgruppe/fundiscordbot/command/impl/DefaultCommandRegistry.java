@@ -54,11 +54,14 @@ public class DefaultCommandRegistry extends ListenerAdapter implements CommandRe
       message.getTextChannel().sendMessage("Der Command wurde nicht gefunden.").complete();
       return;
     }
-    if(command instanceof ICooldown){
+    if (command instanceof ICooldown) {
       CooldownManager cooldownManager = CooldownManager.getInstance();
       ICooldown cooldown = (ICooldown) command;
-      if(cooldownManager.hasCooldown(command, event.getMember())) {
-        message.getTextChannel().sendMessage(String.format("Du hast noch ein Cooldown `(%d sec)`. Bitte warte noch etwas.", cooldown.cooldownLength())).queue(message1 -> message1.delete().completeAfter(3, TimeUnit.SECONDS));
+      if (cooldownManager.hasCooldown(command, event.getMember())) {
+        message.getTextChannel()
+            .sendMessage(String.format("Du hast noch ein Cooldown `(%d sec)`. Bitte warte noch etwas.",
+                cooldown.cooldownLength()))
+            .queue(message1 -> message1.delete().completeAfter(3, TimeUnit.SECONDS));
         return;
       } else {
         cooldownManager.addCooldown(command, message.getMember());
