@@ -4,12 +4,14 @@ import de.devgruppe.fundiscordbot.Constants;
 import de.devgruppe.fundiscordbot.FunDiscordBotStarter;
 import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandResponse;
+import de.devgruppe.fundiscordbot.cooldown.ICooldown;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 
 /**
  * Created by GalaxyHD on 26.09.2017.
  */
-public class PingCommand extends Command {
+public class PingCommand extends Command implements ICooldown{
 
   private static final int COUNT = 8;
 
@@ -56,4 +58,13 @@ public class PingCommand extends Command {
     return CommandResponse.ACCEPTED;
   }
 
+  @Override
+  public boolean bypassCooldown(Member member) {
+    return false;
+  }
+
+  @Override
+  public int cooldownLength() {
+    return 20;
+  }
 }

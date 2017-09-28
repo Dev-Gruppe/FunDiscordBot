@@ -3,6 +3,8 @@ package de.devgruppe.fundiscordbot.command.impl;
 import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandRegistry;
 import de.devgruppe.fundiscordbot.command.CommandResponse;
+import de.devgruppe.fundiscordbot.cooldown.CooldownManager;
+import de.devgruppe.fundiscordbot.cooldown.ICooldown;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -12,6 +14,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by GalaxyHD on 11.09.2017.
@@ -50,6 +53,16 @@ public class DefaultCommandRegistry extends ListenerAdapter implements CommandRe
     if (command == null) {
       message.getTextChannel().sendMessage("Der Command wurde nicht gefunden.").complete();
       return;
+    }
+    if(command instanceof ICooldown){
+      CooldownManager cooldownManager = CooldownManager.getInstance();
+      ICooldown cooldown = (ICooldown) command;
+      if(cooldownManager.hasCooldown(command, event.getMember())) {
+        message.getTextChannel().sendMessage(String.format("Du hast noch ein Cooldown `(%d sec)`. Bitte warte noch etwas.", cooldown.cooldownLength())).queue(message1 -> message1.delete().completeAfter(3, TimeUnit.SECONDS));
+        return;
+      } else {
+        cooldownManager.addCooldown(command, message.getMember());
+      }
     }
     CommandResponse commandResponse = command.triggerCommand(message, args);
     if (commandResponse == CommandResponse.SYNTAX_PRINTED)
