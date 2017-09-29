@@ -16,6 +16,8 @@ import net.dv8tion.jda.core.entities.Message;
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class MemeGenCommand extends Command {
@@ -40,32 +42,36 @@ public class MemeGenCommand extends Command {
         return CommandResponse.SYNTAX_PRINTED;
       }
       final StringBuilder urlRequest = new StringBuilder();
-      urlRequest.append(args[0]).append("/");
+      urlRequest.append(URLEncoder.encode(args[0], StandardCharsets.UTF_8.toString())).append("/");
       if (args.length >= 2) {
         final String text = this.getEscapedText(String.join(" ", Arrays.copyOfRange(args, 1, args.length)))
-                .replaceAll(" +", " ");
+                .replaceAll(" +", "_");
         final String[] splitText = text.split(";");
+        for (int i = 0; i < splitText.length; i++) {
+          splitText[i] = URLEncoder.encode(splitText[i], StandardCharsets.UTF_8.toString());
+        }
         if (splitText.length == 2) {
           urlRequest.append(splitText[0]).append("/").append(splitText[1]);
         } else if (splitText.length == 1) {
-          urlRequest.append(text);
+          urlRequest.append(splitText[0]);
         } else {
           message.getTextChannel().sendMessage("Es darf maximal ein Semikolon(``;``) in deine Nachricht enthalten sein.").queue();
           return CommandResponse.ACCEPTED;
         }
+        final String url = MemeGenHelper.REQUEST_URL + MemeGenHelper.TEMPLATE_PATH + urlRequest.toString().toLowerCase();
         final HttpRequest.RequestResponse response = HttpRequest.performRequest(new HttpRequest.RequestBuilder(
-                MemeGenHelper.REQUEST_URL + MemeGenHelper.TEMPLATE_PATH + urlRequest.toString().toLowerCase(), HttpRequest.HttpRequestMethod.GET)
+                url, HttpRequest.HttpRequestMethod.GET)
                 .addHeader(MemeGenHelper.REQUEST_HEADERS[0], MemeGenHelper.REQUEST_HEADERS[1])
                 .addHeader(MemeGenHelper.REQUEST_HEADERS[2], MemeGenHelper.REQUEST_HEADERS[3])
                 .setReadTimeout(FunDiscordBotStarter.getInstance().getConfig().getMemeTimeout()));
         if (response.getStatus() == GiphyHelper.EXPECTED_RESPONSE_CODE) {
           final JsonElement jsonElement = new JsonParser().parse(response.getResultMessage());
           final JsonObject jsonObject = jsonElement.getAsJsonObject().getAsJsonObject(JSON_DIRECT_KEY);
-          final String url = jsonObject.get(JSON_MASKED_KEY).getAsString();
-          message.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(" ").setImage(url)
+          final String memeUrl = jsonObject.get(JSON_MASKED_KEY).getAsString();
+          message.getTextChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(" ").setImage(memeUrl)
                   .addField("Meme-Name", args[0], true)
                   .addField("Erstellt von", message.getAuthor().getName(), true)
-                  .addField("URL", url, true).build()).queue();
+                  .addField("URL", memeUrl, true).build()).queue();
           return CommandResponse.ACCEPTED;
         } else {
           FunDiscordBotStarter.getLogger().warn("The memegen.link server returned an unexpected HTTP Status code (" + response.getStatus() + "): " + response.getResultMessage());
