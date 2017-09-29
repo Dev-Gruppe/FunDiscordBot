@@ -30,11 +30,11 @@ public class PingCommand extends Command implements ICooldown {
   public CommandResponse triggerCommand(Message message, String[] args) {
     if (args.length == 1) {
       if (args[0].equalsIgnoreCase("nice")) {
-        Constants.EXECUTOR_SERVICE.execute(() -> message.getTextChannel().sendMessage("Ping...").queue(pingMessage -> {
+        message.getTextChannel().sendMessage("Ping...").queue(pingMessage -> Constants.EXECUTOR_SERVICE.execute(() -> {
           long lastResult;
           long sum = 0, min = 999, max = 0;
           for (int i = 0; i < COUNT; i++) {
-            pingMessage.editMessage(pingMessages[i % pingMessages.length]).complete();
+            pingMessage.editMessage(pingMessages[i % pingMessages.length]).queue();
             lastResult = FunDiscordBotStarter.getInstance().getJda().getPing();
             sum += lastResult;
             min = Math.min(min, lastResult);
