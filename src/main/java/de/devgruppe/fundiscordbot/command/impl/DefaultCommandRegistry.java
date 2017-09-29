@@ -4,6 +4,7 @@ import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandRegistry;
 import de.devgruppe.fundiscordbot.command.CommandResponse;
 import de.devgruppe.fundiscordbot.cooldown.CooldownManager;
+import de.devgruppe.fundiscordbot.cooldown.CooldownResponse;
 import de.devgruppe.fundiscordbot.cooldown.ICooldown;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Message;
@@ -57,13 +58,14 @@ public class DefaultCommandRegistry extends ListenerAdapter implements CommandRe
     if (command instanceof ICooldown) {
       CooldownManager cooldownManager = CooldownManager.getInstance();
       ICooldown cooldown = (ICooldown) command;
-      if (cooldownManager.hasCooldown(command, event.getMember())) {
+      CooldownResponse cooldownResponse = cooldownManager.hasCooldown(command, event.getMember());
+      if (cooldownResponse == CooldownResponse.TRUE) {
         message.getTextChannel()
             .sendMessage(String.format("Du hast noch ein Cooldown `(%d sec)`. Bitte warte noch etwas.",
-                cooldown.cooldownLength()))
-            .queue(message1 -> message1.delete().completeAfter(3, TimeUnit.SECONDS));
+                cooldown.cooldownDuration()))
+            .queue(message1 -> message1.delete().completeAfter(5, TimeUnit.SECONDS));
         return;
-      } else {
+      } else if (cooldownResponse == CooldownResponse.FALSE) {
         cooldownManager.addCooldown(command, message.getMember());
       }
     }

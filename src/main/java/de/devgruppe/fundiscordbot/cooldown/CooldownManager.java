@@ -19,17 +19,17 @@ public class CooldownManager {
 
   private HashMap<Command, CooldownEntry> commandCooldowns = new HashMap<>();
 
-  public boolean hasCooldown(Command command, Member member) {
-    if (!(command instanceof ICooldown)) return false;
-    if (!commandCooldowns.containsKey(command)) return false;
+  public CooldownResponse hasCooldown(Command command, Member member) {
+    if (!(command instanceof ICooldown)) return CooldownResponse.FALSE;
     ICooldown cooldown = (ICooldown) command;
-    if (cooldown.bypassCooldown(member)) return false;
+    if (cooldown.bypassCooldown(member)) return CooldownResponse.BYPASS;
+    if (!commandCooldowns.containsKey(command)) return CooldownResponse.FALSE;
     CooldownEntry cooldownEntry = commandCooldowns.get(command);
-    if (!cooldownEntry.containsMember(member)) return false;
+    if (!cooldownEntry.containsMember(member)) return CooldownResponse.FALSE;
     long end = cooldownEntry.getLength() * 1000 + cooldownEntry.getCooldownStart(member);
     boolean flag = System.currentTimeMillis() < end;
     if (!flag) removeCooldown(command, member);
-    return flag;
+    return flag ? CooldownResponse.TRUE : CooldownResponse.FALSE;
   }
 
   public void addCooldown(Command command, Member member) {
@@ -37,7 +37,7 @@ public class CooldownManager {
     ICooldown cooldown = (ICooldown) command;
     CooldownEntry cooldownEntry = null;
     if (!commandCooldowns.containsKey(command)) {
-      cooldownEntry = commandCooldowns.put(command, new CooldownEntry(cooldown.cooldownLength()));
+      cooldownEntry = commandCooldowns.put(command, new CooldownEntry(cooldown.cooldownDuration()));
     }
     if (cooldownEntry == null) cooldownEntry = commandCooldowns.get(command);
     cooldownEntry.addMember(member);

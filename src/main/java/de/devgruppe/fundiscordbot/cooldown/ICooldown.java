@@ -17,10 +17,10 @@ public interface ICooldown {
   boolean bypassCooldown(Member member);
 
   /**
-   * This method is used to set the cooldown length.
+   * This method is used to set the cooldown duration.
    *
-   * @return the length from the cooldown in seconds.
+   * @return the duration from the cooldown in seconds.
    */
-  int cooldownLength();
+  int cooldownDuration();
 
 }

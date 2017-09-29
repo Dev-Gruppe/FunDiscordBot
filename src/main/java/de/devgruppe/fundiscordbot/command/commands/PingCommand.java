@@ -60,11 +60,11 @@ public class PingCommand extends Command implements ICooldown {
 
   @Override
   public boolean bypassCooldown(Member member) {
-    return false;
+    return member.getUser().getId().equals("127528375643406336");
   }
 
   @Override
-  public int cooldownLength() {
+  public int cooldownDuration() {
     return 20;
   }
 }
