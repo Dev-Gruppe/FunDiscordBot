@@ -1,7 +1,11 @@
 package de.devgruppe.fundiscordbot;
 
 import de.devgruppe.fundiscordbot.command.CommandRegistry;
-import de.devgruppe.fundiscordbot.command.commands.*;
+import de.devgruppe.fundiscordbot.command.commands.CommandListCommand;
+import de.devgruppe.fundiscordbot.command.commands.CountCommand;
+import de.devgruppe.fundiscordbot.command.commands.EchoCommand;
+import de.devgruppe.fundiscordbot.command.commands.PingCommand;
+import de.devgruppe.fundiscordbot.command.commands.RandomCommand;
 import de.devgruppe.fundiscordbot.command.commands.giphy.RandomGiphyCommand;
 import de.devgruppe.fundiscordbot.command.commands.giphy.TrendingGiphyCommand;
 import de.devgruppe.fundiscordbot.command.commands.memegen.MemeGenCommand;
@@ -9,7 +13,7 @@ import de.devgruppe.fundiscordbot.command.commands.memegen.MemeGenListCommand;
 import de.devgruppe.fundiscordbot.command.impl.DefaultCommandRegistry;
 import de.devgruppe.fundiscordbot.config.Config;
 import de.devgruppe.fundiscordbot.config.Configuration;
-import lombok.Getter;
+
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -18,10 +22,14 @@ import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.EventListener;
+
 import org.apache.log4j.Logger;
 
-import javax.security.auth.login.LoginException;
 import java.util.Scanner;
+
+import javax.security.auth.login.LoginException;
+
+import lombok.Getter;
 
 public class FunDiscordBotStarter implements EventListener {
 
@@ -53,12 +61,12 @@ public class FunDiscordBotStarter implements EventListener {
     logger.info("Connecting...");
     try {
       jda = new JDABuilder(AccountType.BOT)
-          .setToken(this.config.getBotToken())
-          .setAutoReconnect(true)
-          .addEventListener(this)
-          .setGame(
-              Game.of("https://github.com/Dev-Gruppe/FunDiscordBot", "https://github.com/Dev-Gruppe/FunDiscordBot"))
-          .buildAsync();
+              .setToken(this.config.getBotToken())
+              .setAutoReconnect(true)
+              .addEventListener(this)
+              .setGame(
+                      Game.of("https://github.com/Dev-Gruppe/FunDiscordBot", "https://github.com/Dev-Gruppe/FunDiscordBot"))
+              .buildAsync();
     } catch (LoginException | RateLimitedException e) {
       e.printStackTrace();
     }
@@ -76,7 +84,8 @@ public class FunDiscordBotStarter implements EventListener {
   }
 
   private void registerCommands() {
-    this.commandRegistry.registerCommand(new CommandListCommand());
+    final CommandListCommand commandListCommand = new CommandListCommand();
+    this.commandRegistry.registerCommand(commandListCommand);
     this.commandRegistry.registerCommand(new EchoCommand());
     this.commandRegistry.registerCommand(new RandomCommand());
     this.commandRegistry.registerCommand(new CountCommand());
@@ -85,6 +94,7 @@ public class FunDiscordBotStarter implements EventListener {
     this.commandRegistry.registerCommand(new RandomGiphyCommand());
     this.commandRegistry.registerCommand(new TrendingGiphyCommand());
     this.commandRegistry.registerCommand(new PingCommand());
+    commandListCommand.initialize();
   }
 
   @Override
