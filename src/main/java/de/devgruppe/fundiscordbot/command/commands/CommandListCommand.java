@@ -16,6 +16,7 @@ import net.dv8tion.jda.core.requests.RestAction;
 import java.awt.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +29,8 @@ import lombok.AllArgsConstructor;
  * Created by GalaxyHD on 12.09.2017.
  */
 public class CommandListCommand extends Command {
+  private LinkedList<MessageEmbed> cachedMessageEmbedMap = new LinkedList<>();
+
   private Map<Message, Integer> registeredHelpCommandMessages = new HashMap<>();
   private static final String ARROW_RIGHT_EMOTE = new String(new byte[]{-30, -98, -95}, StandardCharsets.UTF_8);
   private static final String ARROW_LEFT_EMOTE = new String(new byte[]{-30, -84, -123}, StandardCharsets.UTF_8);
@@ -36,7 +39,35 @@ public class CommandListCommand extends Command {
 
   public CommandListCommand() {
     super("commandlist", "", "Gibt dir eine Übersicht von allen Befehlen aus.");
+  }
+
+  public void initialize() {
     FunDiscordBotStarter.getInstance().getJda().addEventListener(new CommandListReactionListener());
+    int site = 0;
+    int iterateTo;
+    final List<Command> commandList = FunDiscordBotStarter.getInstance().getCommandRegistry().getRegisteredCommands();
+    do {
+      site++;
+      final EmbedBuilder embedBuilder = new EmbedBuilder().setColor(Color.GRAY).setTitle("Befehlsübersicht")
+              .setFooter("Seite " + String.valueOf(site), null);
+      iterateTo = addCommandsToMessageEmbed(site, embedBuilder, commandList);
+      final MessageEmbed messageEmbed = embedBuilder.build();
+      this.cachedMessageEmbedMap.add(messageEmbed);
+    } while (iterateTo < commandList.size());
+  }
+
+  private int addCommandsToMessageEmbed(int site, EmbedBuilder embedBuilder, List<Command> commandList) {
+    final int offset = (site - 1) * ITEM_AMOUNT_PER_SITE;
+    final int iterateTo = offset + ITEM_AMOUNT_PER_SITE;
+    if (offset == iterateTo) {
+      throw new IllegalStateException("Can not display site " + site + " because it would not contain any item!");
+    }
+    for (int i = offset; i < iterateTo && i != commandList.size(); i++) {
+      final Command command = commandList.get(i);
+      embedBuilder.addField(FunDiscordBotStarter.getInstance().getCommandRegistry().getPrefix() + command.getCommandName(),
+              command.getDescription(), false);
+    }
+    return iterateTo;
   }
 
   @Override
@@ -50,11 +81,7 @@ public class CommandListCommand extends Command {
   }
 
   private void displayCommandListSite(final int site, final TextChannel textChannel, final Message editMessage) {
-    final EmbedBuilder embedBuilder = new EmbedBuilder().setColor(Color.GRAY).setTitle("Befehlsübersicht")
-            .setFooter("Seite " + String.valueOf(site), null);
-    final List<Command> commandList = FunDiscordBotStarter.getInstance().getCommandRegistry().getRegisteredCommands();
-    final int iterateTo = addCommandsToMessageEmbed(site, embedBuilder, commandList);
-    final MessageEmbed messageEmbed = embedBuilder.build();
+    final MessageEmbed messageEmbed = this.cachedMessageEmbedMap.get(site - 1);
     final RestAction<Message> restAction;
     if (editMessage != null) {
       restAction = editMessage.editMessage(messageEmbed);
@@ -64,18 +91,14 @@ public class CommandListCommand extends Command {
     restAction.queue(message -> {
       if (site > 1) {
         message.addReaction(ARROW_LEFT_EMOTE).queue(ignoredVoid -> {
-          if (iterateTo < commandList.size()) {
+          if (site < CommandListCommand.this.cachedMessageEmbedMap.size()) {
             message.addReaction(ARROW_RIGHT_EMOTE).queue(new PutMessageMapConsumer(message, site));
           } else {
             new PutMessageMapConsumer(message, site).accept(null);
           }
         });
       } else {
-        if (iterateTo <= commandList.size()) {
-          message.addReaction(ARROW_RIGHT_EMOTE).queue(new PutMessageMapConsumer(message, site));
-        } else {
-          new PutMessageMapConsumer(message, site).accept(null);
-        }
+        message.addReaction(ARROW_RIGHT_EMOTE).queue(new PutMessageMapConsumer(message, site));
       }
     });
   }
@@ -132,19 +155,5 @@ public class CommandListCommand extends Command {
                         CommandListCommand.this.displayCommandListSite(newSite, event.getTextChannel(), editMessage)));
       });
     }
-  }
-
-  private int addCommandsToMessageEmbed(int site, EmbedBuilder embedBuilder, List<Command> commandList) {
-    final int offset = (site - 1) * ITEM_AMOUNT_PER_SITE;
-    final int iterateTo = offset + ITEM_AMOUNT_PER_SITE;
-    if (offset == iterateTo) {
-      throw new IllegalStateException("Can not display site " + site + " because it would not contain any item!");
-    }
-    for (int i = offset; i < iterateTo && i != commandList.size(); i++) {
-      final Command command = commandList.get(i);
-      embedBuilder.addField(FunDiscordBotStarter.getInstance().getCommandRegistry().getPrefix() + command.getCommandName(),
-              command.getDescription(), false);
-    }
-    return iterateTo;
   }
 }
