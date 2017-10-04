@@ -58,7 +58,7 @@ public class FunDiscordBotStarter implements EventListener {
     configuration.readConfiguration();
     config = configuration.getConfig();
     this.commandRegistry = new DefaultCommandRegistry();
-    logger.info("Connecting...");
+    logger.info("Connecting to discord server...");
     try {
       jda = new JDABuilder(AccountType.BOT)
               .setToken(this.config.getBotToken())
@@ -71,7 +71,7 @@ public class FunDiscordBotStarter implements EventListener {
       e.printStackTrace();
     }
     if (jda == null) {
-      logger.error("JDA is null");
+      logger.error("JDA is null. Shutting down...");
       System.exit(0);
     }
     this.jda.addEventListener(this.commandRegistry);
@@ -100,7 +100,7 @@ public class FunDiscordBotStarter implements EventListener {
   @Override
   public void onEvent(Event event) {
     if (event instanceof ReadyEvent) {
-      logger.info("Connected");
+      logger.info("Connected to discord server!");
       new Thread(() -> {
         Scanner scanner = new Scanner(System.in);
         String line;
