@@ -46,7 +46,9 @@ public class PingCommand extends Command implements ICooldown {
             }
           }
           pingMessage.editMessage(
-              String.format("Durchschnittlicher Ping %dms (min: %d, max: %d)", (int) Math.ceil(sum / COUNT), min, max))
+              String
+                  .format("Durchschnittlicher Ping %dms (min: %d, max: %d)", (int) Math.ceil((double) sum / COUNT), min,
+                      max))
               .complete();
         }));
         return CommandResponse.ACCEPTED;
