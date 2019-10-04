@@ -91,6 +91,7 @@ public class FunDiscordBotStarter implements EventListener {
     this.commandRegistry.registerCommand(new TrendingGiphyCommand());
     this.commandRegistry.registerCommand(new PingCommand());
     this.commandRegistry.registerCommand(new StatusCommand());
+    this.commandRegistry.registerCommand(new UserInfoCommand());
     commandListCommand.initialize();
   }
 
