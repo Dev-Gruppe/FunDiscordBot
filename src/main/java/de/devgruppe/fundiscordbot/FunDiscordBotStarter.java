@@ -1,11 +1,7 @@
 package de.devgruppe.fundiscordbot;
 
 import de.devgruppe.fundiscordbot.command.CommandRegistry;
-import de.devgruppe.fundiscordbot.command.commands.CommandListCommand;
-import de.devgruppe.fundiscordbot.command.commands.CountCommand;
-import de.devgruppe.fundiscordbot.command.commands.EchoCommand;
-import de.devgruppe.fundiscordbot.command.commands.PingCommand;
-import de.devgruppe.fundiscordbot.command.commands.RandomCommand;
+import de.devgruppe.fundiscordbot.command.commands.*;
 import de.devgruppe.fundiscordbot.command.commands.giphy.RandomGiphyCommand;
 import de.devgruppe.fundiscordbot.command.commands.giphy.TrendingGiphyCommand;
 import de.devgruppe.fundiscordbot.command.commands.memegen.MemeGenCommand;
@@ -94,6 +90,7 @@ public class FunDiscordBotStarter implements EventListener {
     this.commandRegistry.registerCommand(new RandomGiphyCommand());
     this.commandRegistry.registerCommand(new TrendingGiphyCommand());
     this.commandRegistry.registerCommand(new PingCommand());
+    this.commandRegistry.registerCommand(new StatusCommand());
     commandListCommand.initialize();
   }
 
