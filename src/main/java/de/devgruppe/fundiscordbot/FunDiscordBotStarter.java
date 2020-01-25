@@ -9,7 +9,7 @@ import de.devgruppe.fundiscordbot.command.commands.memegen.MemeGenListCommand;
 import de.devgruppe.fundiscordbot.command.impl.DefaultCommandRegistry;
 import de.devgruppe.fundiscordbot.config.Config;
 import de.devgruppe.fundiscordbot.config.Configuration;
-
+import lombok.Getter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -18,14 +18,11 @@ import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.EventListener;
-
-import org.apache.log4j.Logger;
-
-import java.util.Scanner;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.security.auth.login.LoginException;
-
-import lombok.Getter;
+import java.util.Scanner;
 
 public class FunDiscordBotStarter implements EventListener {
 
@@ -54,19 +51,20 @@ public class FunDiscordBotStarter implements EventListener {
     configuration.readConfiguration();
     config = configuration.getConfig();
     this.commandRegistry = new DefaultCommandRegistry();
-    logger.info("Connecting...");
+    logger.info("Connecting to discord server...");
     try {
       jda = new JDABuilder(AccountType.BOT)
               .setToken(this.config.getBotToken())
               .setAutoReconnect(true)
               .addEventListener(this)
-              .setGame(Game.of("https://github.com/Dev-Gruppe/FunDiscordBot", "https://github.com/Dev-Gruppe/FunDiscordBot"))
+              .setGame(
+                      Game.of("https://github.com/Dev-Gruppe/FunDiscordBot", "https://github.com/Dev-Gruppe/FunDiscordBot"))
               .buildAsync();
     } catch (LoginException | RateLimitedException e) {
       e.printStackTrace();
     }
     if (jda == null) {
-      logger.error("JDA is null");
+      logger.error("JDA is null. Shutting down...");
       System.exit(0);
     }
     this.jda.addEventListener(this.commandRegistry);
@@ -74,12 +72,13 @@ public class FunDiscordBotStarter implements EventListener {
   }
 
   public static void main(String[] args) {
-    logger = Logger.getLogger("FunDiscordBot");
+    logger = LogManager.getLogger("FunDiscordBot");
     new FunDiscordBotStarter();
   }
 
   private void registerCommands() {
-    this.commandRegistry.registerCommand(new CommandListCommand());
+    final CommandListCommand commandListCommand = new CommandListCommand();
+    this.commandRegistry.registerCommand(commandListCommand);
     this.commandRegistry.registerCommand(new EchoCommand());
     this.commandRegistry.registerCommand(new RandomCommand());
     this.commandRegistry.registerCommand(new CountCommand());
@@ -88,12 +87,15 @@ public class FunDiscordBotStarter implements EventListener {
     this.commandRegistry.registerCommand(new RandomGiphyCommand());
     this.commandRegistry.registerCommand(new TrendingGiphyCommand());
     this.commandRegistry.registerCommand(new PingCommand());
+    this.commandRegistry.registerCommand(new StatusCommand());
+    this.commandRegistry.registerCommand(new UserInfoCommand());
+    commandListCommand.initialize();
   }
 
   @Override
   public void onEvent(Event event) {
     if (event instanceof ReadyEvent) {
-      logger.info("Connected");
+      logger.info("Connected to discord server!");
       new Thread(() -> {
         Scanner scanner = new Scanner(System.in);
         String line;

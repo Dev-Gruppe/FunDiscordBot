@@ -1,8 +1,13 @@
 package de.devgruppe.fundiscordbot.command.impl;
 
+import de.devgruppe.fundiscordbot.FunDiscordBotStarter;
 import de.devgruppe.fundiscordbot.command.Command;
 import de.devgruppe.fundiscordbot.command.CommandRegistry;
 import de.devgruppe.fundiscordbot.command.CommandResponse;
+import de.devgruppe.fundiscordbot.cooldown.CooldownManager;
+import de.devgruppe.fundiscordbot.cooldown.CooldownResponse;
+import de.devgruppe.fundiscordbot.cooldown.ICooldown;
+
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -12,6 +17,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by GalaxyHD on 11.09.2017.
@@ -51,12 +57,27 @@ public class DefaultCommandRegistry extends ListenerAdapter implements CommandRe
       message.getTextChannel().sendMessage("Der Command wurde nicht gefunden.").complete();
       return;
     }
+    if (command instanceof ICooldown) {
+      CooldownManager cooldownManager = CooldownManager.getInstance();
+      ICooldown cooldown = (ICooldown) command;
+      CooldownResponse cooldownResponse = cooldownManager.hasCooldown(command, event.getMember());
+      if (cooldownResponse == CooldownResponse.TRUE) {
+        message.getTextChannel()
+                .sendMessage(String.format("Du hast noch ein Cooldown `(%d sec)`. Bitte warte noch etwas.",
+                        cooldown.cooldownDuration()))
+                .queue(message1 -> message1.delete().completeAfter(5, TimeUnit.SECONDS));
+        return;
+      } else if (cooldownResponse == CooldownResponse.FALSE) {
+        cooldownManager.addCooldown(command, message.getMember());
+      }
+    }
+    FunDiscordBotStarter.getLogger().info(String.format("Command - %s#%s - %s", event.getAuthor().getName(), event.getAuthor().getId(), content));
     CommandResponse commandResponse = command.triggerCommand(message, args);
     if (commandResponse == CommandResponse.SYNTAX_PRINTED)
       message.getTextChannel()
-          .sendMessage(
-              MessageFormat.format("Syntax: `{0}{1} {2}`", PREFIX, command.getCommandName(), command.getSyntax()))
-          .complete();
+              .sendMessage(
+                      MessageFormat.format("Syntax: `{0}{1} {2}`", PREFIX, command.getCommandName(), command.getSyntax()))
+              .complete();
   }
 
   @Override
@@ -67,9 +88,9 @@ public class DefaultCommandRegistry extends ListenerAdapter implements CommandRe
   @Override
   public Command getCommandObjectByName(String commandName) {
     return this.commands.stream()
-        .filter(command -> command.getCommandName().equalsIgnoreCase(commandName))
-        .findFirst()
-        .orElse(null);
+            .filter(command -> command.getCommandName().equalsIgnoreCase(commandName))
+            .findFirst()
+            .orElse(null);
   }
 
   @Override

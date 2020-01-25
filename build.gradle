@@ -1,0 +1,98 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '4.0.2'
+}
+
+group = 'de.devgruppe'
+version = '0.0.1'
+description = 'FunDiscordBot'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url = 'http://jcenter.bintray.com'
+    }
+
+    maven {
+        url = 'http://repo.maven.apache.org/maven2'
+    }
+}
+
+dependencies {
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.0'
+
+    compile 'net.dv8tion:JDA:3.4.0_317'
+    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'commons-io:commons-io:2.5'
+
+    compileOnly 'org.projectlombok:lombok:1.18.10'
+    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+}
+
+task sourcesForRelease(type: Copy) {
+    from 'src/main/java'
+    into 'build/filteredSrc'
+    filter(ReplaceTokens, tokens: [VERSION: version, DATE: getBuildDate(), TIME: getBuildTime()])
+}
+
+static def getBuildDate() {
+    return new Date().format('yyyy/MM/dd')
+}
+
+static def getBuildTime() {
+    return new Date().format('HH:mm:ss')
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+    source = sourcesForRelease.destinationDir
+    classpath = sourceSets.main.compileClasspath
+    dependsOn sourcesForRelease
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from "${buildDir}/filteredSrc"
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+javadoc {
+    options.encoding = 'UTF-8'
+    if (JavaVersion.current().java9Compatible) {
+        afterEvaluate {
+            options.addBooleanOption("html5", true)
+        }
+    }
+}
+
+jar {
+    baseName = project.name
+}
+
+shadowJar {
+    classifier = 'withDependencies'
+}
+
+build {
+    dependsOn clean
+    dependsOn jar
+    //dependsOn javadocJar
+    dependsOn sourcesJar
+    dependsOn shadowJar
+
+    jar.mustRunAfter clean
+    javadocJar.mustRunAfter jar
+    //sourcesJar.mustRunAfter javadocJar
+    shadowJar.mustRunAfter sourcesJar
+}
