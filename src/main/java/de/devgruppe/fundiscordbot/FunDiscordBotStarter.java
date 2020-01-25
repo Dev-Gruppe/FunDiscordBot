@@ -9,7 +9,7 @@ import de.devgruppe.fundiscordbot.command.commands.memegen.MemeGenListCommand;
 import de.devgruppe.fundiscordbot.command.impl.DefaultCommandRegistry;
 import de.devgruppe.fundiscordbot.config.Config;
 import de.devgruppe.fundiscordbot.config.Configuration;
-
+import lombok.Getter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -18,14 +18,11 @@ import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.EventListener;
-
-import org.apache.log4j.Logger;
-
-import java.util.Scanner;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.security.auth.login.LoginException;
-
-import lombok.Getter;
+import java.util.Scanner;
 
 public class FunDiscordBotStarter implements EventListener {
 
@@ -75,7 +72,7 @@ public class FunDiscordBotStarter implements EventListener {
   }
 
   public static void main(String[] args) {
-    logger = Logger.getLogger("FunDiscordBot");
+    logger = LogManager.getLogger("FunDiscordBot");
     new FunDiscordBotStarter();
   }
 
